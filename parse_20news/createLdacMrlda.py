@@ -50,7 +50,7 @@ def createLdacFile(vocab, corpus,fileName,statFileName, rawFileName, mrldaFileNa
         docIndex=0
         for doc_label in corpus:
 		doc = corpus[doc_label]
-		uniqWord = getUniqCount(doc)
+		uniqWord = getUniqCountInVocab(doc, vocab)
 		if uniqWord > 2:
                 	words =doc.split()
 			mrldaDoc =list()
@@ -58,33 +58,39 @@ def createLdacFile(vocab, corpus,fileName,statFileName, rawFileName, mrldaFileNa
 			proceed =0
                 	for word in words:
                         	if word.strip() in vocab:
-					proceed =1
 					mrldaDoc.append(word.strip())
                                 	tmpIndex =vocab[word.strip()]
                                 	if tmpIndex in doc_dict:
                                         	doc_dict[tmpIndex] +=1
                                 	else:
                                         	doc_dict[tmpIndex]=1
-                        if proceed ==1:
-				aDoc=str(uniqWord)
-                        	for i in sorted(doc_dict.iterkeys()):
-                                	aDoc+=" "+str(i)+":"+str(doc_dict[i])
-                        	file.write(aDoc+"\n")
-                        	stat_file.write(str(docIndex)+"\t"+doc_label+"\n")
-                        	#print raw file
-				raw_file.write(doc+"\n")
-				#print mrlda file 
-				mrldaText =" ".join(mrldaDoc)
-				mrlda_file.write(doc_label+"\t"+mrldaText+"\n")
-				docIndex+=1
-			else:
-				print "discarding " + doc_label		
+			aDoc=str(uniqWord)
+                        for i in sorted(doc_dict.iterkeys()):
+                               	aDoc+=" "+str(i)+":"+str(doc_dict[i])
+                        file.write(aDoc+"\n")
+                        stat_file.write(str(docIndex)+"\t"+doc_label+"\n")
+                        #print raw file
+			raw_file.write(doc+"\n")
+			#print mrlda file 
+			mrldaText =" ".join(mrldaDoc)
+			mrlda_file.write(doc_label+"\t"+mrldaText+"\n")
+			docIndex+=1
 		else:
 			print "discarding "+ doc_label
         file.close()
         stat_file.close()
 	raw_file.close()
 	mrlda_file.close()
+
+def getUniqCountInVocab(text, dictionary):
+        tmp =dict()
+        words = text.split()
+        for word in words:
+                if word.strip() in dictionary:
+                        tmp[word.strip()] =True
+        return len(tmp)
+
+
 #count uniuq word in text
 def getUniqCount(text):
 	tmp =dict()
